@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dataSource.db.Btc38TradeInfoMapper" >
+    <resultMap id="BaseResultMap" type="com.entity.Btc38TradeInfo" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="catch_time" property="catchTime" jdbcType="TIMESTAMP" />
+        <result column="tid" property="tid" jdbcType="VARCHAR" />
+        <result column="trade_time" property="tradeTime" jdbcType="TIMESTAMP" />
+        <result column="price" property="price" jdbcType="DECIMAL" />
+        <result column="amount" property="amount" jdbcType="DECIMAL" />
+        <result column="trade_type" property="tradeType" jdbcType="TINYINT" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        id, catch_time, tid, trade_time, price, amount, trade_type
+    </sql>
+    <sql id="condition" >
+        <if test="null!=params" >
+            <if test="null != params.id and '' != params.id" >
+                and id = #{params.id,jdbcType=BIGINT}
+            </if>
+            <if test="null != params.catchTime and '' != params.catchTime" >
+                and catch_time = #{params.catchTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="null != params.tid and '' != params.tid" >
+                and tid = #{params.tid,jdbcType=VARCHAR}
+            </if>
+            <if test="null != params.tradeTime and '' != params.tradeTime" >
+                and trade_time = #{params.tradeTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="null != params.tradeType and '' != params.tradeType" >
+                and trade_type = #{params.tradeType,jdbcType=TINYINT}
+            </if>
+        </if>
+    </sql>
+
+    <select id="queryForList" resultMap="BaseResultMap" parameterType="map" >
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM btc38_trade WHERE 1=1
+        <include refid="condition" />
+    </select>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO btc38_trade (
+        id, catch_time, tid, trade_time, price, amount, trade_type)
+        VALUES(
+        <foreach collection="list" item="record" open="" close=""
+                 separator="),(">
+            #{record.id,jdbcType=BIGINT},
+            #{record.catchTime,jdbcType=TIMESTAMP},
+            #{record.tid,jdbcType=VARCHAR},
+            #{record.tradeTime,jdbcType=TIMESTAMP},
+            #{record.price,jdbcType=DECIMAL},
+            #{record.amount,jdbcType=DECIMAL},
+            #{record.tradeType,jdbcType=TINYINT}
+        </foreach>
+        )
+    </insert>
+
+</mapper>

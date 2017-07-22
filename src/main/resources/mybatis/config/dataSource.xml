@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 数据源配置 -->
+    <bean id="parentDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close" abstract="true">
+        <property name="filters" value="stat" />
+        <property name="maxActive" value="50" />
+        <property name="initialSize" value="1" />
+        <property name="maxWait" value="60000" />
+        <property name="minIdle" value="2" />
+        <property name="timeBetweenEvictionRunsMillis" value="3000" />
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+    </bean>
+    
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" parent="parentDataSource">
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/btctrade?useUnicode=true" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+
+    <!-- Mybatis所有操作基于sqlSession，而下面这个就是它的工厂Bean -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- mapper.xml文件存放的位置 -->
+        <property name="mapperLocations" value="classpath:mybatis/mapper/*Mapper.xml"/>
+        <property name="plugins">
+            <bean class="com.dataSource.interceptor.ShardInterceptor"/>
+        </property>
+    </bean>
+
+    <!-- 自动扫描指定包内接口为org.mybatis.spring.mapper.MapperFactoryBean -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- mapper接口包 -->
+        <property name="basePackage" value="com.datasource.db" />
+        <!-- mapper接口需要用到sqlSessionFactory 如果上下文环境只有一个数据源 则不需要配置 -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+</beans>

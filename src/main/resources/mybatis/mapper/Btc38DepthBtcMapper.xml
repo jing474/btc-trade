@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dataSource.db.Btc38DepthInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.entity.Btc38DepthInfo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="catch_time" property="catchTime" jdbcType="TIMESTAMP" />
+    <result column="price_type" property="priceType" jdbcType="TINYINT" />
+    <result column="top_price" property="topPrice" jdbcType="DECIMAL" />
+    <result column="middle_price" property="middlePrice" jdbcType="DECIMAL" />
+    <result column="low_price" property="lowPrice" jdbcType="DECIMAL" />
+    <result column="avg_price" property="avgPrice" jdbcType="DECIMAL" />
+    <result column="total_number" property="totalNumber" jdbcType="DECIMAL" />
+    <result column="total_price" property="totalPrice" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, catch_time, price_type, top_price, middle_price, low_price, avg_price, total_number, total_price
+  </sql>
+  <sql id="condition" >
+    <if test="null!=params" >
+      <if test="null != params.id and '' != params.id" >
+         and id = #{params.id,jdbcType=BIGINT}
+      </if>
+      <if test="null != params.catchTime and '' != params.catchTime" >
+         and catch_time = #{params.catchTime,jdbcType=TIMPSTAMP}
+      </if>
+      <if test="null != params.priceType and '' != params.priceType" >
+         and price_type = #{params.priceType,jdbcType=INT}
+      </if>
+    </if>
+  </sql>
+  <select id="queryForList" resultMap="BaseResultMap" parameterType="map" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM btc38_depth WHERE 1=1
+    <include refid="condition" />
+  </select>
+
+  <insert id="batchInsert" parameterType="java.util.List">
+    INSERT INTO btc38_depth (
+    id, catch_time, price_type, top_price, middle_price, low_price, avg_price, total_number, total_price)
+    VALUES(
+    <foreach collection="list" item="record" open="" close=""
+             separator="),(">
+      #{record.id,jdbcType=BIGINT},
+      #{record.catchTime,jdbcType=TIMESTAMP},
+      #{record.priceType,jdbcType=TINYINT},
+      #{record.topPrice,jdbcType=DECIMAL},
+      #{record.middlePrice,jdbcType=DECIMAL},
+      #{record.lowPrice,jdbcType=DECIMAL},
+      #{record.avgPrice,jdbcType=DECIMAL},
+      #{record.totalNumber,jdbcType=DECIMAL},
+      #{record.totalPrice,jdbcType=DECIMAL}
+    </foreach>
+    )
+  </insert>
+</mapper>
